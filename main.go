@@ -1,16 +1,16 @@
 package main
 
 import (
-    "fmt"
-    "net/http"
+	"github.com/gin-gonic/gin"
+	"github.com/muci-cell/go-http/routes"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "Hello, World!")
-}
-
 func main() {
-    http.HandleFunc("/", handler)
-    fmt.Println("服务器在 :8123 端口运行...")
-    http.ListenAndServe(":8123", nil)
+    r := gin.Default()
+
+    // 注册路由
+    routes.SetupRoutes(r)
+
+    // 启动服务器
+    r.Run(":8123")
 }
