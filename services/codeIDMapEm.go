@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/url"
 )
@@ -59,11 +60,27 @@ func CodeIDMapEm() (map[string]string, error) {
 	if err := fetchData(url, map[string]string{"fs": "b:MK0404,b:MK0405,b:MK0406,b:MK0407"}, codeIDDict,"0"); err != nil {
 		return nil, err
 	}
-
+	// 测试市场6 基金 5开头是1上海    1开头是0深圳
+	if err := fetchData(url, map[string]string{"fs": "b:MK0021,b:MK0022,b:MK0023,b:MK0024,b:MK0827"}, codeIDDict,"1/0"); err != nil {
+		return nil, err
+	}
 	return codeIDDict, nil
 }
-
+func checkCodeID(idKey string, codeIDDict string) string {
+	if idKey == "1/0" {
+		if len(codeIDDict) > 0 {
+			switch codeIDDict[0] {
+			case '5':
+				return "1"
+			case '1':
+				return "0"
+			}
+		}
+	}
+	return idKey // 如果条件不满足，直接返回市场值
+}
 func fetchData(baseURL string, params map[string]string, codeIDDict map[string]string, idKey string) error {
+	
 	// 创建 URL 对象
 	u, err := url.Parse(baseURL)
 	if err != nil {
@@ -104,9 +121,9 @@ func fetchData(baseURL string, params map[string]string, codeIDDict map[string]s
 	if len(responseData.Data.Diff) == 0 {
 		return nil
 	}
-
 	for _, item := range responseData.Data.Diff {
-		codeIDDict[item.F12] = idKey
+		
+		codeIDDict[item.F12]=checkCodeID(idKey,item.F12)
 	}
 
 	return nil
@@ -117,5 +134,5 @@ func GetMarketID(code string) (string, error) {
 	if marketID, exists := MarketMap[code]; exists {
 		return marketID, nil
 	}
-	return "0",nil
+	return "",errors.New("证券所属市场获取错误")
 }
