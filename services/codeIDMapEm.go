@@ -2,7 +2,6 @@ package services
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/url"
 )
@@ -35,6 +34,29 @@ func CodeIDMapEm() (map[string]string, error) {
 
 	// 3. 获取北京市场
 	if err := fetchData(url, map[string]string{"fs": "m:0 t:81 s:2048"}, codeIDDict,"0"); err != nil {
+		return nil, err
+	}
+	//         // fs: "m:113 t:15",       // 证券过滤器
+        // fs: "m:1 t:2",       // 证券过滤器
+	// 4.测试市场1 沪港通etf
+	if err := fetchData(url, map[string]string{"fs": "b:MK0839"}, codeIDDict,"1"); err != nil {
+		return nil, err
+	}
+	// 测试市场2 深港通etf
+	if err := fetchData(url, map[string]string{"fs": "b:MK0840"}, codeIDDict,"0"); err != nil {
+		return nil, err
+	}
+
+	// 测试市场3 沪港通reits
+	if err := fetchData(url, map[string]string{"fs": "m:1 t:9 e:97"}, codeIDDict,"1"); err != nil {
+		return nil, err
+	}
+	// 测试市场4 深港通reits
+	if err := fetchData(url, map[string]string{"fs": "m:0 t:10 e:97"}, codeIDDict,"0"); err != nil {
+		return nil, err
+	}
+	// 测试市场5 lof 深圳
+	if err := fetchData(url, map[string]string{"fs": "b:MK0404,b:MK0405,b:MK0406,b:MK0407"}, codeIDDict,"0"); err != nil {
 		return nil, err
 	}
 
@@ -92,9 +114,8 @@ func fetchData(baseURL string, params map[string]string, codeIDDict map[string]s
 
 // GetMarketID 根据证券代码返回市场编号
 func GetMarketID(code string) (string, error) {
-
 	if marketID, exists := MarketMap[code]; exists {
 		return marketID, nil
 	}
-	return "", errors.New("证券代码未找到")
+	return "0",nil
 }
