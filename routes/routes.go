@@ -50,4 +50,15 @@ func SetupRoutes(r *gin.Engine) {
         }
         c.JSON(200, gin.H{"historical_net_value": netValue})
     })
+
+    // 读取标的所属市场的API
+    r.GET("/api/macket", func(c *gin.Context) {
+		fundCode := c.Query("fundCode")
+        code,err:=services.GetMarketID(fundCode)
+        if err != nil {
+            c.JSON(500, gin.H{"error": err.Error()})
+            return
+        }
+        c.JSON(200, code)
+    })
 }
