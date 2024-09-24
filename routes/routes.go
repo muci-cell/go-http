@@ -2,13 +2,23 @@ package routes
 
 import (
 	"strconv"
-
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/muci-cell/go-http/services"
 )
 
 // SetupRoutes 配置路由
 func SetupRoutes(r *gin.Engine) {
+
+    r.Use(cors.New(cors.Config{
+        AllowOrigins:     []string{"*"}, // 允许访问的源
+        AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+        AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+        ExposeHeaders:    []string{"Content-Length"},
+        AllowCredentials: true,
+    }))
+
+
     // 读取交易价格的API
     r.GET("/api/trade-price", func(c *gin.Context) {
 		symbol := c.Query("symbol")
